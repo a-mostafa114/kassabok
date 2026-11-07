@@ -72,6 +72,7 @@ For a receipt, the per-line date and shop are empty strings, and the rest is fil
 - branch: the branch or area exactly as printed (like "Vinsta" or "Hornstull"), or an empty string if none.
 - date: the purchase date as YYYY-MM-DD, or an empty string if none is printed.
 - total: the amount paid as printed (ATT BETALA, Totalt, Summa, Total), or null if not printed.
+- If the receipt shows only the amount paid and no product lines (a card slip, or a till receipt without items), return items as an empty list and put the amount in total. Don't invent items.
 - currency: ISO code, usually SEK.
 - payment: card, Swish, cash, or empty string if unclear.
 - problem: empty string normally. If the input is neither a receipt nor a list of payments, or parts can't be read, say so briefly here; still return every line you can read.
@@ -210,6 +211,8 @@ export function toReceipt(r, today, by = 'AI', known = []) {
     const alt = build(false);
     if (fits(alt)) items = alt;
   }
+  // Only the total is printed: keep it as one "not itemized" entry; the preview asks for the items.
+  if (!items.some(i => i.kind === 'product') && total > 0) items = [{ ...C.notItemizedItem(total), kind: 'product', disc: 0 }];
   return {
     type: 'receipt',
     store,

@@ -150,7 +150,8 @@ async function receipt(env, chat, uid, text) {
   if (!r.items.length) {
     // A format the built-in parser doesn't know: let the AI read it.
     if (readerOf(env)) return aiReceipt(env, chat, uid, { text });
-    return quickAdd(env, chat, uid, text.split('\n')[0]);
+    if (!(r.total > 0)) return quickAdd(env, chat, uid, text.split('\n')[0]);
+    r.items = [C.notItemizedItem(r.total)]; // only a total: the preview asks for the items
   }
   const date = r.date && C.isISO(r.date) ? r.date : today(env);
   return showReceipt(env, chat, uid, { ...r, date, items: r.items.map(it => ({ ...it, date, store: r.store })) });
@@ -167,6 +168,14 @@ async function showReceipt(env, chat, uid, r, mid) {
   if (items.length > 40) lines.push(`…and ${items.length - 40} more`);
   const check = r.total != null ? (Math.abs(r.total - sum) < 0.01 ? ` ✓ matches receipt total` : ` ⚠️ receipt says ${C.kr(r.total)}`) : '';
   const notes = [];
+  const onlyTotal = C.totalOnly(items);
+  if (onlyTotal) {
+    const shop = (r.store || '').split(' (')[0].trim();
+    notes.push(`⚠️ <b>This receipt only shows the total, not what you bought.</b> Please enter the items too:\n` +
+      `• send the itemised receipt (the digital one in the Lidl Plus, Willys or ICA app, or Kivra, lists every line), or a clearer photo of the whole paper receipt, or\n` +
+      `• type each item, like <code>149.98 ${/^\S+$/.test(shop) ? esc(shop) + ' ' : ''}chicken fillet 2kg</code>\n` +
+      `If you add the items, cancel this so the total isn’t counted twice.`);
+  }
   if (dup) {
     const where = `${esc(r.store || 'that shop')} on ${C.fmtDay(r.date)}`;
     notes.push(dup.kind === 'items' ? `⚠️ <b>This receipt may already be in your ledger:</b> ${dup.count} of these ${items.length} amounts from ${where} are already there.`
@@ -176,9 +185,9 @@ async function showReceipt(env, chat, uid, r, mid) {
   if (r.currency && r.currency !== 'SEK') notes.push(`⚠️ This receipt is in ${esc(r.currency)}; amounts will be saved as kr.`);
   if (r.problem) notes.push(`<i>${esc(r.problem)}</i>`);
   if (r.by) notes.push(`<i>Read by ${esc(r.by)}. Check the items before adding.</i>`);
-  const text = `🧾 <b>${esc(r.store || 'Receipt')}</b> · ${C.fmtDay(r.date)}\n${lines.join('\n')}\n\n<b>${items.length} items · ${C.kr(sum)}</b>${check}` + (notes.length ? '\n\n' + notes.join('\n') : '');
+  const text = `🧾 <b>${esc(r.store || 'Receipt')}</b> · ${C.fmtDay(r.date)}\n${lines.join('\n')}\n\n<b>${plural(items.length, 'item', 'items')} · ${C.kr(sum)}</b>${check}` + (notes.length ? '\n\n' + notes.join('\n') : '');
   return reply(env, chat, mid, text, {
-    reply_markup: { inline_keyboard: [[{ text: dup ? `⚠️ Add anyway (${items.length})` : `✅ Add all ${items.length}`, callback_data: `rcpt:${id}` }, { text: '✖️ Cancel', callback_data: `rcpx:${id}` }]] },
+    reply_markup: { inline_keyboard: [[{ text: dup ? `⚠️ Add anyway (${items.length})` : onlyTotal ? '⚠️ Add total only' : `✅ Add all ${items.length}`, callback_data: `rcpt:${id}` }, { text: '✖️ Cancel', callback_data: `rcpx:${id}` }]] },
   });
 }
 

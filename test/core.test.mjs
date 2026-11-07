@@ -118,3 +118,16 @@ test('duplicate detection', () => {
   assert.equal(rec(ica).kind, 'total');                                             // receipt for a bank line already added
   assert.deepEqual(C.dupWindow([E('2026-11-05', '', '', 1), E('2026-11-07', '', '', 1)]), { from: '2026-11-03', to: '2026-11-09' });
 });
+
+test('receipts that show only the total are spotted', () => {
+  const it = (item, amount, orig = null) => ({ item, orig, amount });
+  assert.equal(C.totalOnly([C.notItemizedItem(66.49)]), true);
+  assert.equal(C.totalOnly([it('Total', 120, 'TOTALT')]), true);
+  assert.equal(C.totalOnly([it('Groceries', 47.14, 'Mat (ej specificerat)')]), true);
+  assert.equal(C.totalOnly([it('Amount paid', 99), it('Bottle deposit', 3)]), true);
+  // real items, even a single one, are itemised
+  assert.equal(C.totalOnly([it('Cola', 18.83)]), false);
+  assert.equal(C.totalOnly([it('Food processor', 499)]), false);
+  assert.equal(C.totalOnly([it('Meat', 126, 'Kött'), it('Fresh dates 500g', 29.98)]), false);
+  assert.equal(C.totalOnly([]), false);
+});

@@ -112,6 +112,7 @@ Under each reply there are **🏷 Category** and **↩️ Undo** buttons.
 - Photos, and text in formats the parser doesn't know, are read by **Cloudflare Workers AI** (Mistral Small 3.1), free within Cloudflare's daily allowance (about 100 receipts a day). Past the allowance the bot says so and you can paste the text instead; nothing is charged. A photo takes about 15–20 seconds.
 - **Bank app screenshots** work too: each payment becomes its own entry with its own date and shop (amounts in kr, even when a foreign amount is shown). Possible duplicates are flagged, and you choose **Add new** or **Add all**.
 - Entries read by AI have "Read by Cloudflare AI" in their note. Always glance at the preview: the bot warns when the items don't add up to the receipt total.
+- **Total-only receipts:** if a receipt shows only the amount paid (a card slip, a till receipt without items, or just a "Total" line), the preview warns that the items must be entered too, and asks for the itemised receipt or the items typed one by one. You can still save it as one "Groceries (not itemized)" entry with **Add total only**. The artifact's receipt window warns the same way.
 
 ### Optional: Claude instead of the free model
 Claude reads receipts more reliably and also reads PDFs, but the Claude API is paid per use (a few US cents per receipt) and is **not** included in a Claude Pro/Max subscription. To switch, create a key at https://platform.claude.com (add credit under **Billing**), then:

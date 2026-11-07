@@ -304,6 +304,24 @@ export function parseReceiptText(txt, knownStores = [], history = []) {
   return { store, date: dm ? dm[0] : null, total: tmatch ? num(tmatch[1]) : null, pay, items };
 }
 
+/* ---------- receipts that show only the total ---------- */
+// A receipt with no item lines, only what was paid (a card slip, a till receipt without items, or a single
+// line like "Groceries (not itemized)"). Saving it as one entry hides what was bought, so we ask for the items.
+export const NOT_ITEMIZED = 'Groceries (not itemized)';
+const TOTAL_WORDS = /^(total|totalt|summa|sum|att betala|belopp|amount|amount paid|groceries|food|mat|livsmedel|varor|purchase|k[oö]p|kortk[oö]p|payment|betalning)$/;
+const TOTAL_HINT = /not itemi[sz]ed|ej specificera|subtotal|delsumma/;
+export function isTotalLine(name) {
+  const low = String(name || '').toLowerCase();
+  return TOTAL_HINT.test(low) || TOTAL_WORDS.test(low.replace(/\(.*?\)/g, ' ').replace(/[^a-zåäöéü]+/g, ' ').trim());
+}
+// True when every bought line (deposits and discounts aside) is just a total.
+export function totalOnly(items) {
+  const goods = (items || []).filter(i => +i.amount > 0 && i.item !== 'Bottle deposit');
+  return goods.length > 0 && goods.every(i => isTotalLine(i.item) || isTotalLine(i.orig));
+}
+// The one entry for a receipt that shows nothing but its total.
+export const notItemizedItem = total => ({ item: NOT_ITEMIZED, orig: null, qty: null, amount: round2(total), cat: 'Groceries' });
+
 /* ---------- duplicate detection ---------- */
 // Used everywhere entries are added (typed, receipts, bank screenshots, Mini App) to warn before adding
 // something that's probably already in the ledger. `existing` is the ledger's entries around the same dates.

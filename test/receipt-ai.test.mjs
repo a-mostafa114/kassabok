@@ -73,3 +73,14 @@ test('bank screenshots become one entry per payment, with their own dates and sh
   ]);
   for (const it of r.items) assert.ok(C.cleanTx(it).ok, JSON.stringify(it));
 });
+
+test('a receipt with only a total becomes one "not itemized" entry', () => {
+  const r = toReceipt({ ...base, chain: 'ICA', branch: '', total: 66.49, items: [] }, '2026-11-07', 'AI');
+  assert.equal(r.items.length, 1);
+  assert.equal(r.items[0].item, C.NOT_ITEMIZED);
+  assert.equal(r.items[0].amount, 66.49);
+  assert.equal(r.items[0].store, 'ICA');
+  assert.equal(C.totalOnly(r.items), true);
+  // nothing readable at all: still no items
+  assert.equal(toReceipt({ ...base, total: null, items: [] }, '2026-11-07').items.length, 0);
+});
