@@ -1,0 +1,5 @@
+BOT_TOKEN=123:ABC
+WEBHOOK_SECRET=testsecret
+API_KEY=testkey
+ALLOWED_USER_IDS=42
+# TG_API=http://127.0.0.1:8799   # point the bot at a mock server when testing

@@ -1,0 +1,12 @@
+node_modules/
+.wrangler/
+.dev.vars
+# your personal financial data
+migration/export/
+migration/seed.sql
+
+# the claude.ai connector URL contains a secret
+connector-url.txt
+
+# macOS
+.DS_Store

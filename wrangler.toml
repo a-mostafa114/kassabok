@@ -1,0 +1,31 @@
+name = "kassabok"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+# The Mini App (public/app/*) is served as static files.
+[assets]
+directory = "./public"
+
+[vars]
+TZ = "Europe/Stockholm"
+# "open": anyone who starts the bot gets their own private ledger. "closed": only existing users.
+SIGNUP = "open"
+# Receipt photos each person can have read by AI per day (the free AI allowance is shared by everyone).
+AI_DAILY_LIMIT = "20"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "kassabok"
+database_id = "99ed07f6-590e-401b-9ed4-ffadaf9ae5de"
+
+# Secrets (set with `npx wrangler secret put NAME`, never put them here):
+#   BOT_TOKEN       from @BotFather
+#   WEBHOOK_SECRET  any long random string
+#   API_KEY         any long random string, for /setup and scripts
+#   ALLOWED_USER_IDS  Telegram user ids that share the household ledger (ledger 1), comma-separated,
+#                     e.g. 123456789,987654321. Only needed the first time each of them uses the bot.
+#   MCP_SECRET      optional; turns on the claude.ai connector at /mcp/<MCP_SECRET>
+
+# Cloudflare Workers AI: reads receipt photos for free (within the daily free allowance).
+[ai]
+binding = "AI"

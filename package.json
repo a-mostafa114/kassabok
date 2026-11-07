@@ -1,0 +1,19 @@
+{
+  "name": "kassabok-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:init": "wrangler d1 execute kassabok --remote --file=schema.sql",
+    "db:import": "wrangler d1 execute kassabok --remote --file=migration/seed.sql",
+    "seed": "node migration/to-sql.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.6.0"
+  }
+}

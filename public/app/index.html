@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kassabok</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="pnav">
+    <button id="pPrev" class="ib" aria-label="Previous period">‹</button>
+    <div class="plabel"><b id="pLabel">—</b><span id="pBadge" class="badge"></span></div>
+    <button id="pNext" class="ib" aria-label="Next period">›</button>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button data-tab="overview" aria-selected="true">Overview</button>
+    <button data-tab="trends">Trends</button>
+    <button data-tab="tx">Entries</button>
+    <button data-tab="budgets">Budgets</button>
+  </nav>
+</header>
+
+<main>
+  <section id="tab-overview" class="tab"><div class="loading">Opening the ledger…</div></section>
+  <section id="tab-trends" class="tab" hidden></section>
+  <section id="tab-tx" class="tab" hidden>
+    <div class="toolbar">
+      <input id="fq" type="search" placeholder="Search items, stores, notes">
+      <select id="fcat"><option value="">All categories</option></select>
+      <select id="fscope"><option value="period">This period</option><option value="all">All periods</option></select>
+    </div>
+    <div id="txSum" class="muted small"></div>
+    <div id="txList"></div>
+  </section>
+  <section id="tab-budgets" class="tab" hidden></section>
+</main>
+
+<button id="fab" class="fab" aria-label="Add expense">+</button>
+<div id="sheet" class="sheet-wrap" hidden></div>
+<div id="toast" class="toast" hidden></div>
+<script src="app.js" defer></script>
+</body>
+</html>
